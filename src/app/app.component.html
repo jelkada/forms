@@ -1,0 +1,178 @@
+
+
+<div class="container my-5">
+
+  <div class="row no-gutters">
+    <div class="col-xs-12">
+      <h3>Template-based and reactive forms <span class="no-wrap">(<a href="https://github.com/jelkada/forms" target="_blank">see on github</a>)</span></h3>
+      <ul>
+        <li>The example shows how to implement forms in Angular using both the template-based and the reactive-driven methods.</li>
+        <li>In both approaches Angular maintains a JS/TypeScript object that represent the form, with extensive information about each control in the form.</li>
+        <li>In the template-based approach the object representation of the form is created automatically by Angular by detecting the &lt;form&gt; element in the HTML template.</li>
+        <li>In the reactive-based approach the object representation of the form is created manually in TypeScript and then bound to the form control elements in the HTML template.</li>
+        <li>The examples below shows form set up, validation and error handling using both methods - template-based and reactive-based.</li>
+        <li>In the reactive-based approach there is example of adding form controls dynamically and setting up an asynchronous validator using (simulated with timeout).</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr />
+
+  <div class="row no-gutters">
+    <div class="col-xs-12 col-sm-10 col-md-8 col-sm-offset-1 col-md-offset-2">
+
+      <h5 class="my-4">Template-based form:</h5>
+      <form (ngSubmit)="onSubmit(f)" #f="ngForm">
+
+        <div id="user-data" ngModelGroup="userData" #userData="ngModelGroup">
+          <div class="form-group mb-2">
+            <label for="username" class="mb-1">Username:</label>
+            <input type="text" id="username" class="form-control" ngModel name="username" required>
+          </div>
+          <button class="btn btn-secondary" type="button" (click)="onSuggestUserName()">Suggest an Username</button>
+
+          <div class="form-group mt-3">
+            <label for="email" class="mb-1">Mail:</label>
+            <input type="email" id="email" class="form-control" ngModel name="email" required email #email="ngModel">
+            <span class="help-block" *ngIf="!email.valid && email.touched">Please enter a valid email.</span>
+          </div>
+          <p *ngIf="!userData.valid && email.touched">User data is invalid !!</p>
+        </div>
+
+        <div class="form-group mt-4">
+          <label for="question" class="mb-1">Secret Question:</label>
+          <select id="question" class="form-control" ngModel name="question" [ngModel]="defaultQuestion">
+            <option>Your first Pet?</option>
+            <option>Your first teacher?</option>
+          </select>
+        </div>
+
+        <div class="form-group mt-3 mb-4">
+          <label for="answer" class="mb-1">Enter answer:</label>
+          <textarea id="answer" name="answer" class="form-control mb-1" [(ngModel)]="answer"></textarea>
+          <span>Your answer: {{ answer }}</span>
+        </div>
+
+        <div class="form-group m-0" *ngFor="let gender of genders">
+          <label>
+            <input type="radio" name="gender" [value]="gender" required ngModel >
+            {{ gender }}
+          </label>
+        </div>
+
+        <button class="btn btn-primary px-3 mt-3" type="submit" [disabled]="!f.valid">Submit</button>
+      </form>
+
+      <div *ngIf="submitted" class="py-3">
+        Your input:
+        <br/>Username: {{ user.username }}
+        <br/>Email: {{ user.email }}
+        <br/>Question: {{ user.question }}
+        <br/>Answer: {{ user.answer }}
+        <br/>Gender: {{ user.gender }}
+      </div>
+
+
+      <hr class="mt-5" />
+
+
+      <h5 class="my-4">Reactive-driven form:</h5>
+      <form [formGroup]="reactiveForm" (ngSubmit)="onSubmit1()">
+
+        <div class="form-group mb-2">
+          <label for="username1" class="mb-1">Username1:</label>
+          <input type="text" id="username1" class="form-control mb-2" formControlName="username1">
+          <span *ngIf="!reactiveForm.get('username1').valid && reactiveForm.get('username1').touched"
+                class="help-block">
+            <span *ngIf="reactiveForm.get('username1').errors['nameIsForbidden']">This username is forbidden.</span>
+            <span *ngIf="reactiveForm.get('username1').errors['required']">The username is required.</span>
+          </span>
+        </div>
+
+
+        <div class="form-group mt-3">
+          <label for="email" class="mb-1">Mail1:</label>
+          <input type="email" id="email1" class="form-control" formControlName="email1">
+          <span *ngIf="!reactiveForm.get('email1').valid && reactiveForm.get('email1').touched"
+                class="help-block">
+
+            Please enter a valid email.</span>
+        </div>
+
+        <div class="form-group m-0" *ngFor="let gender of genders">
+          <label>
+            <input type="radio" name="gender1" [value]="gender" formControlName="gender1" required>
+            {{ gender }}
+          </label>
+        </div>
+
+        <div formArrayName="hobbies">
+          <p class="my-2">Your hobbies: </p>
+          <button class="btn btn-dark mb-0" type="button" (click)="onAddHobby()">Add hobby</button>
+          <div class="form-group mt-3"
+               *ngFor="let hobbyControl of reactiveForm.get('hobbies')['controls']; let i = index">
+            <input type="text" class="form-control" [formControlName]="i">
+          </div>
+        </div>
+
+        <button class="btn btn-primary px-3 mt-3 mr-2" type="submit" [disabled]="!reactiveForm.valid">Submit1</button> <span class="btn-message">(see console log)</span>
+      </form>
+
+    </div>
+  </div>
+
+  <hr class="mt-5"/>
+
+  <div class="row no-gutters">
+    <div class="col-xs-12 ng-non-bindable">
+      <h4 class="mt-3">Form types and handling:</h4>
+      <ul>
+        <li>Angular provides some powerful tools to handle forms such as validation, error detection, reset options and form submission.</li>
+        <li>Angular detects the &lt;form&gt; element and creates a JavaScript object representation of the form.</li>
+        <li>The &lt;form&gt; tag does not have any action and method attributes since Angular handles the form submission.</li>
+        <li>Angular has two approaches to handling forms: the Template-based approach and the Reactive approach.</li>
+        <li>Template driven forms - a simple approach where angular creates the JS form object automatically from the HTML &lt;form&gt; - easy to use but with limited functionality.</li>
+        <li>Reactive driven forms - a more complex approach where the developer creates the form JS object programmatically - allows for more control and flexibility.</li>
+        <li>Reactive driven forms are great for dynamic forms, where the user can add controls/inputs to the form and for custom validation and custom error messages.</li>
+        <li>In reactive forms Angular does not detect automatically input controls and add them to the corresponding JS form object - the developer need to bind the TypeScript variables to the HTML elements using the “formControlName” directive.</li>
+        <li>For reactive form you can create asynchronous validators that wait for server response (which return a async construct Promise/Observable).</li>
+      </ul>
+      <h4 class="mt-3">Usage guidelines:</h4>
+      <ul>
+        <li>To import the class used to create the JS object representation of the form use:</li>
+        <ul>
+          <li>Template-driven form: import &#123;NgForm&#125; from '@angular/forms'; <br/>Also, in the app.module.ts: import &#123;FormsModule&#125; from '@angular/forms';</li>
+          <li>Reactive-driven form: import &#123;FormGroup&#125; from '@angular/forms'; <br/>Also, in the app.module.ts: import &#123;ReactiveFormsModule&#125; from '@angular/forms';</li>
+        </ul>
+        <li>To bind a &lt;form&gt; element to its JS object representation use:
+        <ul>
+          <li>Template-driven form: &lt;form #f="ngForm”&gt;</li>
+          <li>Reactive-driven form: &lt;form [formGroup]="reactiveForm”&gt; and create reactiveForm in TypeScript, such as this.reactiveForm = new FormGroup(&#123; ... &#125;);</li>
+        </ul>
+        <li>To bind a control element such as &lt;input&gt; to its JS object representation use:</li>
+        <ul>
+          <li>Template-driven form: add an ngModel directive and a name property with the TypeScript variable name, such as ngModel name="email”.</li>
+          <li>Reactive-driven form: add a formControlName attribute and assign to it the TypeScript variable name, such as formControlName="email”. </li>
+        </ul>
+        <li>To bind a group of controls to its JS object representation use:</li>
+        <ul>
+          <li>Template-driven form: declare in the HTML a local reference and assign to ngModelGroup, such as ngModelGroup="userData" #userData="ngModelGroup" (where userData is the HTML local reference).</li>
+          <li>Reactive-driven form: add in the HTML the attribute formGroupName and assign to it the TypeScript variable from the class, such as formGroupName=“userData” (where userData is the TypeScript variable name).</li>
+        </ul>
+        <li>To bind validators to form controls use:</li>
+        <ul>
+          <li>Template-driven form: in the HTML add to the form control attributes, such as “required” and “email”.</li>
+          <li>Reactive-driven form: in TypeScript add to the FormControl instance the built in Validators, such as ’email1': new FormControl(null, [Validators.required, Validators.email])</li>
+        </ul>
+        <li>To bind the Submit button to the &lt;form&gt; element use:</li>
+        <ul>
+          <li>Template-driven form: &lt;form (ngSubmit)="onSubmit(f)" #f="ngForm”&gt;</li>
+          <li>Reactive-driven form: &lt;form [formGroup]="reactiveForm" (ngSubmit)="onSubmit()”&gt;</li>
+        </ul>
+        <li>setValue(), patchValue() and reset() methods on the form JS object work the same in both approaches.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
